@@ -1,0 +1,15 @@
+[
+  {
+    "id": "1768518875974",
+    "title": "Yerba Mate",
+    "description": "Yerba mate tradicional",
+    "code": "YERBA01",
+    "price": 1500,
+    "status": true,
+    "stock": 20,
+    "category": "Alimentos",
+    "thumbnails": [
+      "img/yerba.jpg"
+    ]
+  }
+]
