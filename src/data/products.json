@@ -11,5 +11,19 @@
     "thumbnails": [
       "img/yerba.jpg"
     ]
+  },
+  {
+    "id": "1772028940324"
+  },
+  {
+    "id": "1772029111295",
+    "title": "Azucar",
+    "description": "Azucar blanca",
+    "code": "AZU01",
+    "price": 900,
+    "status": true,
+    "stock": 10,
+    "category": "Alimentos",
+    "thumbnails": []
   }
 ]
