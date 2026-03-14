@@ -1,16 +1,23 @@
-import app from "./app.js";
-import http from "http";
-import { Server } from "socket.io";
+import express from "express";
+import mongoose from "mongoose";
+import productsRouter from "./routes/products.router.js";
 
-const server = http.createServer(app);
-const io = new Server(server);
+const app = express();
+const PORT = 8080;
 
-app.set("io", io);
+app.use(express.json());
 
-io.on("connection", (socket) => {
-  console.log("Nuevo cliente conectado");
+app.use("/api/products", productsRouter);
+
+// CONEXIÓN A MONGODB
+mongoose.connect("mongodb+srv://jesszorzon:070324@cluster0.un5o850.mongodb.net/ecommerce")
+.then(() => {
+    console.log("Conectado a MongoDB");
+})
+.catch((error) => {
+    console.log("Error conectando a MongoDB:", error);
 });
 
-server.listen(8080, () => {
-  console.log("Servidor funcionando en puerto 8080");
+app.listen(PORT, () => {
+    console.log(`Servidor funcionando en puerto ${PORT}`);
 });

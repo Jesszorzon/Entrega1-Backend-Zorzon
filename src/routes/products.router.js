@@ -1,46 +1,83 @@
 import { Router } from "express";
-import ProductManager from "../managers/ProductManager.js";
+import Product from "../models/product.model.js";
 
 const router = Router();
-const productManager = new ProductManager("./src/data/products.json");
 
-// GET productos
+// GET productos con paginación
 router.get("/", async (req, res) => {
-  const products = await productManager.getProducts();
-  res.json(products);
+
+  try {
+
+    const { limit = 10, page = 1, query, sort } = req.query;
+
+    let filter = {};
+    let sortOption = {};
+
+    if (query) {
+      filter.category = query;
+    }
+
+    if (sort === "asc") {
+      sortOption.price = 1;
+    }
+
+    if (sort === "desc") {
+      sortOption.price = -1;
+    }
+
+    const result = await Product.paginate(filter, {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sortOption,
+      lean: true
+    });
+
+    res.json({
+      status: "success",
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage ? `/api/products?page=${result.prevPage}` : null,
+      nextLink: result.hasNextPage ? `/api/products?page=${result.nextPage}` : null
+    });
+
+  } catch (error) {
+
+    res.json({
+      status: "error",
+      message: error.message
+    });
+
+  }
+
 });
 
-// GET producto por ID
-router.get("/:pid", async (req, res) => {
-  const { pid } = req.params;
-  const product = await productManager.getProductById(pid);
-  res.json(product);
-});
 
 // POST crear producto
 router.post("/", async (req, res) => {
-  const newProduct = await productManager.addProduct(req.body);
 
-  const products = await productManager.getProducts();
+  try {
 
-  const io = req.app.get("io");
-  io.emit("updateProducts", products);
+    const newProduct = await Product.create(req.body);
 
-  res.json(newProduct);
-});
+    res.json({
+      status: "success",
+      payload: newProduct
+    });
 
-// DELETE eliminar producto
-router.delete("/:pid", async (req, res) => {
-  const { pid } = req.params;
+  } catch (error) {
 
-  await productManager.deleteProduct(pid);
+    res.json({
+      status: "error",
+      message: error.message
+    });
 
-  const products = await productManager.getProducts();
+  }
 
-  const io = req.app.get("io");
-  io.emit("updateProducts", products);
-
-  res.json({ message: "Producto eliminado" });
 });
 
 export default router;
